@@ -8,26 +8,14 @@ import reservationRouter from './routes/reservationRoute.js';
 const app = express();
 dotenv.config({ path: "./config/config.env" });
 
-// Add custom middleware to handle OPTIONS requests
-app.use((req, res, next) => {
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
-    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    return res.status(200).end();
-  }
-  next();
-});
+// Remove trailing slash from FRONTEND_URL if present
+const frontendURL = process.env.FRONTEND_URL?.replace(/\/$/, '');
 
 // Configure CORS with correct origin handling
 app.use(cors({
-    origin: [
-        process.env.FRONTEND_URL,  // Use this if it's defined in your .env file
-        "http://localhost:3000",
-        "http://localhost:4000"
-    ], // Ensure the frontend URL is correct here
-    credentials: true, // Allow cookies and credentials
-    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+    origin: [frontendURL, "http://localhost:3000", "http://localhost:4000"], // Ensure correct frontend URL
+    credentials: true,  // Allow credentials like cookies
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"], // Include OPTIONS
     allowedHeaders: ["Content-Type", "Authorization"], // Allow necessary headers
 }));
 
