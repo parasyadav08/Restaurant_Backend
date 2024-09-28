@@ -1,4 +1,3 @@
-// app.js
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -7,18 +6,29 @@ import { errorMiddleware } from "./error/error.js";
 import reservationRouter from './routes/reservationRoute.js';
 
 const app = express();
-
-
-// Load environment variables from .env file
 dotenv.config({ path: "./config/config.env" });
 
-// CORS configuration
+// Add custom middleware to handle OPTIONS requests
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return res.status(200).end();
+  }
+  next();
+});
+
+// Configure CORS with correct origin handling
 app.use(cors({
-    origin: [process.env.FRONTEND_URL, "http://localhost:3000", "http://localhost:4000"], 
-    credentials: false,
-    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
-    allowedHeaders: ["Content-Type", "X-Auth-Token", "Origin", "Authorization"], 
-    exposedHeaders: ["Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers"],
+    origin: [
+        process.env.FRONTEND_URL,  // Use this if it's defined in your .env file
+        "http://localhost:3000",
+        "http://localhost:4000"
+    ], // Ensure the frontend URL is correct here
+    credentials: true, // Allow cookies and credentials
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"], // Allow necessary headers
 }));
 
 // Middleware to parse incoming JSON and URL-encoded requests
@@ -34,5 +44,4 @@ dbConnection();
 // Error middleware
 app.use(errorMiddleware);
 
-// No need to call app.listen here
 export default app;
