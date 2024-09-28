@@ -17,7 +17,8 @@ app.use(cors({
     origin: [process.env.FRONTEND_URL, "http://localhost:3000", "http://localhost:4000"], 
     credentials: false,
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
-    allowedHeaders: ["Content-Type"],
+    allowedHeaders: ["Content-Type", "X-Auth-Token", "Origin", "Authorization"], 
+    exposedHeaders: ["Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers"],
 }));
 
 // Middleware to parse incoming JSON and URL-encoded requests
